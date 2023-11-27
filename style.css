@@ -1,0 +1,61 @@
+/* Navbar styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: center;
+  }
+  
+  #ltpContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  span {
+    margin-right: 20px;
+  }
+  
+  /* User Input Form styles */
+  main {
+    margin: 20px;
+  }
+  
+  #inputForm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  label {
+    margin-right: 10px;
+  }
+  
+  select,
+  button {
+    padding: 8px;
+    margin-right: 10px;
+  }
+  
+  button {
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Candlestick Chart Container styles */
+  #candlestickChart {
+    height: 400px;
+    width: 100%;
+    border: 1px solid #ccc;
+  }
+  

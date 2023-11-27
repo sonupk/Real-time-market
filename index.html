@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket and Candlestick Charts</title>
+   
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div id="ltpContainer">
+                Last Traded Prices:
+                <span id="Nifty"></span>
+                <span id="BankNifty"></span>
+                <span id="FinNifty"></span>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <!-- User Input Form -->
+        <div id="inputForm">
+            <label for="instrument">Select Instrument:</label>
+            <select id="instrument">
+                
+            </select>
+            <label for="timeFrame">Select Candlestick Time Frame:</label>
+            <select id="timeFrame">
+                <option value="1">1 min</option>
+                <option value="3">3 min</option>
+                <option value="5">5 min</option>
+            </select>
+            <button id="generateChartBtn">Generate Chart</button>
+        </div>
+        
+
+        <!-- Candlestick Chart Container -->
+        <div id="candlestickChart">
+            <!-- Placeholder for candlestick charts -->
+        </div>
+         <!-- Canvas for Candlestick Chart -->
+         <canvas id="candlestickChartCanvas"></canvas>
+    </main>
+    
+    <!-- Include JavaScript files and Socket.IO library
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script src="app.js"></script> -->
+<script>
+
+    
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('generateChartBtn').addEventListener('click', generateCandlestickChart);
+    const selectedTimeFrame = document.getElementById('timeFrame').value;
+    console.log(selectedTimeFrame);
+    const socket = io('wss://functionup.fintarget.in/ws?id=fintarget-functionup');
+
+    socket.on('connect', () => {
+        console.log('Connected to WebSocket');
+    });
+
+    socket.on('message', (data) => {
+        const ltpData = JSON.parse(data);
+        updateLTP(ltpData);
+    });
+
+    function updateLTP(ltpData) {
+        document.getElementById('Nifty').innerText = `Nifty: ${ltpData.Nifty}`;
+        document.getElementById('BankNifty').innerText = `BankNifty: ${ltpData.BankNifty}`;
+        document.getElementById('FinNifty').innerText = `FinNifty: ${ltpData.FinNifty}`;
+    }
+
+    function generateCandlestickChart() {
+         
+        // Fetch historical data based on selectedInstrument and selectedTimeFrame
+        const historicalData = [
+            { time: '09:15', open: 19500, high: 19700, low: 19450, close: 19650 },
+            
+        ];
+        // Import Chart.js from a CDN
+               const script = document.createElement('script');
+               script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+               document.head.appendChild(script);
+               script.onload = () => {
+        const ctx = document.getElementById('candlestickChartCanvas').getContext('2d');
+        const chart = new chart(ctx,{
+            type:'candlestick',
+            data:{
+                datasets:[{
+                    label:selectedInstrument,
+                    data:historicalData.map(data => ({
+                        t: new Date(`2023-11-27T${data.time}:00Z`), // Change this date format as per your data
+                    o: data.open,
+                    h: data.high,
+                    l: data.low,
+                    c: data.close
+                    })),
+                    borderColor:'black',
+                    borderWidth:1
+                
+                }]
+            
+            },
+        
+        
+            options:{
+                scales:{
+                    x:{
+                        type:'time',// Use 'time' for time-scale
+                        time:{
+                            unit:'minute',// Display x-axis in minute intervals
+                            displayFormats:{
+                                minutes:'HH:mm'// Format for display (hours:minutes)
+                            }
+                        },
+                        title:{
+                            display:true,
+                            text:'Time'// X-axis label
+                        }
+                    },
+                    y:{
+                        title:{
+                            display:true,
+                            text:'Price'// Y-axis label
+                        }
+                    }
+                },
+                plugins:{
+                    legend:{
+                        display:true,
+                        position:'top'// Position of the legend
+                    }
+                }
+            }
+        });
+    }
+        
+        
+    }
+    // Update the chart in the designated container on the UI
+    function updateChartWithData(newData) {
+        chart.data.datasets[0].data.push({
+            t: new Date(), // Update with the new time
+            o: newData.open,
+            h: newData.high,
+            l: newData.low,
+            c: newData.close
+        });
+        chart.update(); // Update the chart with new data
+    }
+    setTimeout(()=>{
+        updateChartWithData({ open: 19700, high: 19900, low: 19650, close: 19850 });
+    },5000)// receiving new data after 5 seconds
+
+    
+});
+
+
+
+</script>
+
+
+</body>
+</html>
